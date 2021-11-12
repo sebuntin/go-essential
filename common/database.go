@@ -3,22 +3,23 @@ package common
 import (
 	"fmt"
 	"github.com/jinzhu/gorm"
+	"github.com/spf13/viper"
 	"sebuntin/ginessential/model"
 )
 
 var DB *gorm.DB
 
 func InitDb() *gorm.DB {
-	driveName := "mysql"
-	host := "localhost"
-	userName := "root"
-	port := "3306"
-	DBname := "gin-essential"
-	password := "654232"
-	charset := "utf8"
-	args := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=%s&parseTime=true", userName, password, host, port, DBname, charset)
+	driverName := viper.GetString("datasource.driverName")
+	host := viper.GetString("datasource.host")
+	port := viper.GetString("datasource.port")
+	dbName := viper.GetString("datasource.database")
+	userName := viper.GetString("datasource.username")
+	password := viper.GetString("datasource.password")
+	charset := viper.GetString("datasource.charset")
+	args := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=%s&parseTime=true", userName, password, host, port, dbName, charset)
 	var err error
-	DB, err = gorm.Open(driveName, args)
+	DB, err = gorm.Open(driverName, args)
 	if err != nil {
 		panic("failed to connect database, err: " + err.Error())
 	}
