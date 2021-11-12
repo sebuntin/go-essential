@@ -1,0 +1,13 @@
+# server config
+server:
+  port: 8008
+
+# data base config
+datasource:
+  driverName: mysql
+  host: 127.0.0.1
+  port: 3306
+  database: gin-essential
+  username: root
+  password: 654232
+  charset: utf8
