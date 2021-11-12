@@ -55,6 +55,14 @@ func Register(ctx *gin.Context) {
 		Password: userPassword,
 	}
 	createUser(db, &newUser)
+
+	// 发放token
+	token, err := common.ReleaseToken(newUser)
+	if err != nil {
+		log.Printf("token generate error: %v\n", err)
+		response.Response(ctx, http.StatusInternalServerError, 500, nil, "系统异常")
+		return
+	}
 	// 返回结果
 	ctx.JSON(http.StatusOK, gin.H{
 		"code": 200,
@@ -63,7 +71,13 @@ func Register(ctx *gin.Context) {
 	return
 }
 
-func RandomString(num int) string {
+// Info get user info
+func Info(ctx *gin.Context) {
+	user, _ := ctx.Get("user")
+	response.Success(ctx, gin.H{"user": user}, "success")
+}
+
+func randomString(num int) string {
 	rand.Seed(time.Now().Unix())
 	var letters = []byte("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
 	result := make([]byte, num)
