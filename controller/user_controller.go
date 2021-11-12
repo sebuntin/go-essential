@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"sebuntin/ginessential/common"
 	"sebuntin/ginessential/model"
+	"sebuntin/ginessential/response"
 	"time"
 )
 
@@ -18,33 +19,24 @@ func Register(ctx *gin.Context) {
 	userPhone := ctx.PostForm("phone")
 	userPassword := ctx.PostForm("password")
 
-	// 数据认证
+	// 数据验证
 	if len(userPhone) != 11 {
-		ctx.JSON(http.StatusUnprocessableEntity, gin.H{
-			"code": 422,
-			"msg":  "手机号必须为11位",
-		})
+		response.Response(ctx, http.StatusUnprocessableEntity, 422, nil, "手机号必须为11位")
 		return
 	}
 	if len(userPassword) < 6 {
-		ctx.JSON(http.StatusUnprocessableEntity, gin.H{
-			"code": 422,
-			"msg":  "密码不能少于6位",
-		})
+		response.Response(ctx, http.StatusUnprocessableEntity, 422, nil, "密码不能少于6位")
 		return
 	}
 
 	// 如果名称没传,则生成10位随机字符串
 	if len(userName) == 0 {
-		userName = RandomString(10)
+		userName = randomString(10)
 	}
 
 	// 判断手机号是否存在
 	if isPhoneNumberExist(db, userPhone) {
-		ctx.JSON(http.StatusUnprocessableEntity, gin.H{
-			"code": 422,
-			"msg":  "用户已存在",
-		})
+		response.Response(ctx, http.StatusUnprocessableEntity, 422, nil, "用户已存在")
 		return
 	}
 	log.Println(userName, userPhone, userPassword)
@@ -64,10 +56,7 @@ func Register(ctx *gin.Context) {
 		return
 	}
 	// 返回结果
-	ctx.JSON(http.StatusOK, gin.H{
-		"code": 200,
-		"msg":  "注册成功",
-	})
+	response.Success(ctx, gin.H{"token": token}, "注册成功")
 	return
 }
 
