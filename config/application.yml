@@ -1,7 +1,6 @@
 # server config
 server:
   port: 8008
-
 # data base config
 datasource:
   driverName: mysql

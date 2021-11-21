@@ -17,13 +17,14 @@ func AuthMiddleware() gin.HandlerFunc {
 		tokenString := ctx.GetHeader("Authorization")
 		// validate token format
 		if tokenString == "" || !strings.HasPrefix(tokenString, "Bearer ") {
+			log.Println("invalid token: ", tokenString)
 			response.Response(ctx, http.StatusUnauthorized, 401, nil, "无权限操作")
 			ctx.Abort()
 			return
 		}
 		token, claims, err := common.ParseToken(tokenString[7:])
 		if err != nil {
-			log.Printf("parse token failed, error: %v", err)
+			log.Printf("parse token failed, token: %v, error: %v, ", tokenString, err)
 			response.Response(ctx, http.StatusUnauthorized, 401, nil, "无权限操作")
 			ctx.Abort()
 			return
@@ -33,6 +34,7 @@ func AuthMiddleware() gin.HandlerFunc {
 		DB := common.GetDb()
 		var user model.User
 		DB.First(&user, claims.UserId)
+		user.Password = ""
 
 		// 判断用户是否存在
 		if user.ID == 0 || !token.Valid {
